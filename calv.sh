@@ -12,13 +12,13 @@ if [ "$option" = "-a" ]; then
     echo "$title"'\n'"$description"'\n'"$date"'\n' >> "$location"
 elif [ "$option" = "-d" ]; then
     title="$2"
-    set -- "$(grep -n "$title" "$location" | cut -d : -f 1 | tr '\n' ' ')"
+    lines="$(grep -n "$title" "$location" | cut -d : -f 1)"
     if [ -z "$date" ]; then
-    for line in "$@"
-    do
+      echo "$lines" | while read line; do
+        echo "$line"
         last_line="$(($line+2))"
         sed -i ""$line", "$last_line"d" "$location"
-    done
+      done
     else
         date="$4"
         lines_with_date=grep -n "$date" "$location" | cut -d : -f 1 | head -1
