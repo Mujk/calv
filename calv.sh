@@ -13,12 +13,14 @@ if [ "$option" = "-a" ]; then
 elif [ "$option" = "-d" ]; then
     title="$2"
     lines="$(grep -n "$title" "$location" | cut -d : -f 1)"
+    deleted_lines=0
     if [ -z "$date" ]; then
-      echo "$lines" | while read line; do
-        echo "$line"
-        last_line="$(($line+2))"
-        sed -i ""$line", "$last_line"d" "$location"
-      done
+        echo "$lines" | while read line; do
+          line="$(($line-$deleted_lines))"
+          last_line="$(($line+4))"
+          sed -i ""$line", "$last_line"d" "$location"
+          deleted_lines="$(($deleted_lines+4))"
+        done
     else
         date="$4"
         lines_with_date=grep -n "$date" "$location" | cut -d : -f 1 | head -1
