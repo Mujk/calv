@@ -16,14 +16,25 @@ elif [ "$option" = "-d" ]; then
     deleted_lines=0
     if [ -z "$date" ]; then
         echo "$title_lines" | while read line; do
-          line="$(($line-$deleted_lines))"
-          last_line="$(($line+4))"
-          sed -i ""$line", "$last_line"d" "$location"
-          deleted_lines="$(($deleted_lines+4))"
+            line="$(($line-$deleted_lines))"
+            last_line="$(($line+4))"
+            sed -i ""$line", "$last_line"d" "$location"
+            deleted_lines="$(($deleted_lines+4))"
         done
     else
         date="$4"
-        date_lines=grep -n "$date" "$location" | cut -d : -f 1 | head -1
-#       sed -i '"$lines_with_title", "$lines_with_title"d' "$appointments"
+        date_lines="$(grep -n "$date" "$location" | cut -d : -f 1)"
+        deleted=0
+        echo "$title_lines" | while read title_line; do
+            echo "$date_lines" | while read date_line; do
+            if [ "$(($title_line-$date_line-3))" -eq "0" ]; then
+                sed -i '"$title_line", "$date_line+1"d' "$appointments"
+                break
+            fi
+            done
+            if [ "$deleted" -gt 0 ]; then
+                break
+            fi
+        done
     fi
 fi
